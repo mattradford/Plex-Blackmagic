@@ -1,5 +1,5 @@
 {
-	"name": "auto-bitrate",
+	"name": "plex-blackmagic",
 	"version": "1.0.0",
 	"scripts": {
 		"deploy": "wrangler deploy",

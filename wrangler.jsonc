@@ -1,5 +1,5 @@
 {
-	"name": "auto-bitrate",
+	"name": "plex-blackmagic",
 	"main": "src/index.js",
 	"compatibility_date": "2025-07-31",
 	"observability": {
