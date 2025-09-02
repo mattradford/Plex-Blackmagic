@@ -8,7 +8,7 @@ This is a fork of Plex-Blackmagic by [@zmike808](https://github.com/zmike808/Ple
 
 The default streaming quality for clients is set to 12Mbps (`BITRATE` variable set at `12000`). You can change this during the deploy.
 
-## Prequisites
+## Pre-requisites
 
 You're using a Cloudflare Tunnel to route traffic to your Plex server.
 
