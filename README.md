@@ -1,35 +1,68 @@
 # Plex-Blackmagic
-A cloudflare worker for plex that uses blackmagic to change default client bitrates!
 
-# IMPORTANT!!! Remember to configure the routes in wrangler.toml
-For this to work properly, remember edit wrangler.toml and replace the "CLOUDFLARE_PLEX_URL" in routes with the correct plex domain 
+A Cloudflare Worker for Plex that uses blackmagic to change default client bitrates!
 
-For example if your plex domain was plex.example.com:
+See this long Plex forum thread for more information: https://forums.plex.tv/t/default-all-clients-to-max-internet-streaming/440641
 
+This is a fork of Plex-Blackmagic by [@zmike808](https://github.com/zmike808/Plex-Blackmagic), via changes from [@buroa](https://github.com/buroa/Plex-Blackmagic). I have updated the script to a modern Cloudflare Worker format and added the Cloudflare Button deploy option.
 
-plex.example.com/video/:/transcode/universal/decision*
+The default streaming quality for clients is set to 12Mbps (`BITRATE` variable set at `12000`). You can change this during the deploy.
 
-plex.example.com/video/:/transcode/universal/start*
+## Prequisites
 
-plex.example.com/video/:/transcode/universal/subtitles*
+You're using a Cloudflare Tunnel to route traffic to your Plex server.
 
-Also if you are unfamiliar with wrangler / cf workers refer to the information below
+This is the best guide I've found: https://mythofechelon.co.uk/blog/2024/1/7/how-to-set-up-free-secure-high-quality-remote-access-for-plex
 
-## Wrangler
+And here's one for Unraid: https://dicloak.com/video-insights-detail/simple-cloudflare-tunnel-setup-on-unraid-for-beginners
 
-You can use [wrangler](https://github.com/cloudflare/wrangler) to generate a new Cloudflare Workers project based on this template by running the following command from your terminal:
+## Quick deploy to Cloudflare
+
+In the instructions below, replace `plex.example.com` and `example.com` with your own subdomain and domain.
+
+### 1. Deploy using the Cloudflare button:
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/mattradford/Plex-Blackmagic)
+
+You will set your `URL` (e.g. `plex.example.com`) and `BITRATE` as part of the Worker setup.
+
+### 2. Add routes:
+
+* `Settings` > `Domains & Routes`
+* Add a new route
+* Choose zone (same as your domain)
+* Choose `"Failure mode: Fail closed (block)"` for each route
+* Add these routes:
+  * `plex.example.com/video/:/transcode/universal/decision*`
+  * `plex.example.com/video/:/transcode/universal/start*`
+  * `plex.example.com/video/:/transcode/universal/subtitles*`
+
+## Alternative setup
+
+Fork this repository and add your variables and routes to `wrangler.jsonc`.
+
+Then create a new Worker by importing your forked repository.
 
 ```
-wrangler generate myapp https://github.com/zmike808/Plex-Blackmagic
+"vars": {
+	"URL": "plex.example.com",
+	"BITRATE": "12000"
+},
+"routes": [
+		{
+			"pattern": "plex.example.com/video/:/transcode/universal/decision*",
+			"zone_name": "example.com"
+		},
+		{
+			"pattern": "plex.example.com/video/:/transcode/universal/start*",
+			"zone_name": "example.com"
+		},
+		{
+			"pattern": "plex.example.com/video/:/transcode/universal/subtitles*",
+			"zone_name": "example.com"
+		},
+	]
 ```
-
-Before publishing your code you need to edit `wrangler.toml` file and add your Cloudflare `account_id` - more information about publishing your code can be found [in the documentation](https://workers.cloudflare.com/docs/quickstart/configuring-and-publishing/).
-
-Once you are ready, you can publish your code by running the following command:
-
-```
-wrangler publish
-```
-
-# A Final Quick Note
-Yes, the code is a huge mess. This was just a script I whipped up for myself. I will try to clean it up eventually if it actually ends up being used.
+## Post-deploy
+1) Start streaming something.
+2) Go into your Worker and check the Logs for live activity. You should set `GET` requests against the routes you've set up.
